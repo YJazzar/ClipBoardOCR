@@ -114,7 +114,7 @@ int FileFunctions::execTesseract(const char* inputPNG, const char* outputTXT)
 	ShExecInfo.lpFile = tesseractPath.c_str();
 	ShExecInfo.lpParameters = wparams.c_str();
 	ShExecInfo.lpDirectory = NULL;
-	ShExecInfo.nShow = SW_SHOW;
+	ShExecInfo.nShow = SW_HIDE;
 	ShExecInfo.hInstApp = NULL;
 	ShellExecuteEx(&ShExecInfo);
 	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
