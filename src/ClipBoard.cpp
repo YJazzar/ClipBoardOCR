@@ -132,5 +132,5 @@ int ClipBoard::getFromClipBoard(const char* outputBMP)
         }
     }
 
-    return 0;
+    return -1;
 }

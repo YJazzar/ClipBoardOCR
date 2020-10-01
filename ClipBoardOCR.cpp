@@ -7,6 +7,13 @@
 
 #include "ClipBoardOCR.h"
 #include <string>
+#include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+#include <windows.h>
+#include <iostream>
+
+#include "FileFunctions.h"
 
 #define MAX_LOADSTRING 100
 
@@ -30,6 +37,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// TODO: Place code here.
+	//FileFunctions::RedirectIOToConsole();
+	printf("hello there\n");
 
 	// Initialize global strings
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);

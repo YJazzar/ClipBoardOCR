@@ -8,6 +8,11 @@
 #include <locale>
 #include <atlbase.h>
 #include <fstream>
+#include <stdio.h>
+#include <fcntl.h>
+#include <io.h>
+#include <iostream>
+#include <fstream>
 
 int FileFunctions::convertBMPtoPNG(const char* inputBMP, const char* outputPNG)
 {
@@ -92,9 +97,9 @@ unsigned FileFunctions::decodeBMP(std::vector<unsigned char>& image, unsigned& w
 
 int FileFunctions::execTesseract(const char* inputPNG, const char* outputTXT)
 {
-	
+
 	std::wstring tesseractPath = L"C:\\Program Files\\Tesseract-OCR\\tesseract.exe";
-	std::string params = " " +  std::string(inputPNG) + " " + std::string(outputTXT);
+	std::string params = " " + std::string(inputPNG) + " " + std::string(outputTXT);
 	std::wstring wparams = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(params);
 
 	//LPSTR command = (LPSTR)(tesseractPath + " " + params).c_str();
@@ -128,7 +133,7 @@ int FileFunctions::execTesseract(const char* inputPNG, const char* outputTXT)
 std::string FileFunctions::readFileContents(const char* filePath)
 {
 	std::cout << "Opening the file: " << filePath << std::endl;
-	
+
 	std::string output;
 	std::string line;
 	std::ifstream myfile(filePath);
@@ -137,7 +142,7 @@ std::string FileFunctions::readFileContents(const char* filePath)
 		while (getline(myfile, line))
 		{
 			std::cout << line << '\n';
-			output += line;
+			output += line + " ";
 		}
 		myfile.close();
 	}
@@ -145,4 +150,60 @@ std::string FileFunctions::readFileContents(const char* filePath)
 	else std::cout << "Unable to open file" << std::endl;
 
 	return output;
+}
+
+
+
+#ifndef _USE_OLD_IOSTREAMS
+
+using namespace std;
+
+#endif
+
+// maximum mumber of lines the output console should have
+
+static const WORD MAX_CONSOLE_LINES = 500;
+
+
+void FileFunctions::RedirectIOToConsole()
+{
+	int hConHandle;
+	long lStdHandle;
+
+	CONSOLE_SCREEN_BUFFER_INFO coninfo;
+	FILE* fp;
+
+	// allocate a console for this app
+	AllocConsole();
+
+	// set the screen buffer to be big enough to let us scroll text
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),	&coninfo);
+	coninfo.dwSize.Y = MAX_CONSOLE_LINES;
+	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),	coninfo.dwSize);
+
+	// redirect unbuffered STDOUT to the console
+	lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+	fp = _fdopen(hConHandle, "w");
+	*stdout = *fp;
+	setvbuf(stdout, NULL, _IONBF, 0);
+
+	// redirect unbuffered STDIN to the console
+	lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
+	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+	fp = _fdopen(hConHandle, "r");
+	*stdin = *fp;
+	setvbuf(stdin, NULL, _IONBF, 0);
+
+	// redirect unbuffered STDERR to the console
+	lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
+	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+	fp = _fdopen(hConHandle, "w");
+	*stderr = *fp;
+	setvbuf(stderr, NULL, _IONBF, 0);
+
+	// make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog
+	// point to console as well
+	ios::sync_with_stdio();
+
 }

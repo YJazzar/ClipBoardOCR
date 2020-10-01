@@ -14,4 +14,6 @@ namespace FileFunctions
 
 	int execTesseract(const char* inputPNG, const char* outputTXT);
 	std::string readFileContents(const char* filePath);
+
+	void RedirectIOToConsole();
 }
